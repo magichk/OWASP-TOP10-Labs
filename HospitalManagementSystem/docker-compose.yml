@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  web:
+    image: php:7.4-apache
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    environment:
+      - MYSQL_HOST=database
+      - MYSQL_DATABASE=hms
+    command: bash -c "apt-get update &&  docker-php-ext-install mysqli && apt-get install -y sed unzip wget mariadb-client && wget https://phpgurukul.com/projects/Hospital-Management-System-PHP.zip -O /tmp/hms.zip && unzip -o /tmp/hms.zip -d /var/www/html/ && mysql -hdatabase -uroot -prootpassword hms < '/var/www/html/Hospital-Management-System-PHP/SQL File/hms.sql' && sed -i \"s/define('DB_PASS' ,'');/define('DB_PASS' ,'rootpassword');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/include/config.php && sed -i \"s/define('DB_SERVER','localhost');/define('DB_SERVER','database');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/include/config.php && sed -i \"s/define('DB_PASS' ,'');/define('DB_PASS' ,'rootpassword');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/admin/include/config.php && sed -i \"s/define('DB_SERVER','localhost');/define('DB_SERVER','database');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/admin/include/config.php && sed -i \"s/define('DB_PASS' ,'');/define('DB_PASS' ,'rootpassword');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/doctor/include/config.php && sed -i \"s/define('DB_SERVER','localhost');/define('DB_SERVER','database');/g\" /var/www/html/Hospital-Management-System-PHP/hospital/hms/doctor/include/config.php && mv /var/www/html/Hospital-Management-System-PHP/hospital/* /var/www/html/ && apache2-foreground"
+    
+  database:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=hms
